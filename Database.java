@@ -78,7 +78,7 @@ public class Database {
     }
 
     public List<CapitalCity> getCapitalCities(String continent) {
-        String query = "SELECT country.name, city.name, " +
+        String query = "SELECT country.name AS Country, city.name AS City, " +
                 "JSON_EXTRACT(doc,'$.geography.Continent') AS Continent, " +
                 "JSON_EXTRACT(Info,'$.Population') AS Population, " +
                 "FROM country " +
@@ -93,8 +93,15 @@ public class Database {
                 PreparedStatement ps = connection.prepareStatement(query);
                 ps.setString(1, continent);
                 ResultSet rs = ps.executeQuery();
-
-                
+                while(rs.next()){
+                    String country=rs.getString("Country");
+                    String city= rs.getString("City");
+                    String contin= rs.getString("Continent");
+                    int popul=rs.getInt("Population");
+                    CapitalCity capitalCity=new CapitalCity(country,city,contin,popul);
+                    list.add(capitalCity);
+                }
+            connection.close();
             }
 
         } catch (ClassNotFoundException e) {
