@@ -14,6 +14,6 @@ public class Main {
         output.printCities(cities);
         List<CapitalCity> capitalCities=database.getCapitalCities("Europe");
         output.printCapitalCities(capitalCities);
-
+        database.insertNewMonument("SVK","Humenne","Kastiel");
     }
 }

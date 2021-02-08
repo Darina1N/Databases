@@ -55,7 +55,8 @@ public class Database {
 
     public void updatePopulation(String country, String name, int popul) {
         if (popul > 0) {
-            String query = "SELECT City.Name, JSON_EXTRACT(Info,'$.Population') AS Population " +
+            String query = "UPDATE city SET Info=? "+
+                    "WHERE SELECT City.Name " +
                     "FROM city " +
                     "INNER JOIN country ON country.code=city.CountryCode " +
                     "WHERE country.name LIKE ? AND City.name LIKE ?";
@@ -70,9 +71,7 @@ public class Database {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (rs != null) {
-                //String query1 = "UPDATE city SET Info =?"
-            }
+
 
         }
     }
@@ -80,7 +79,7 @@ public class Database {
     public List<CapitalCity> getCapitalCities(String continent) {
         String query = "SELECT country.name AS Country, city.name AS City, " +
                 "JSON_EXTRACT(doc,'$.geography.Continent') AS Continent, " +
-                "JSON_EXTRACT(Info,'$.Population') AS Population, " +
+                "JSON_EXTRACT(Info,'$.Population') AS Population " +
                 "FROM country " +
                 "INNER JOIN city ON country.Capital=city.ID " +
                 "INNER JOIN countryInfo ON country.Code=countryinfo._id " +
@@ -104,12 +103,65 @@ public class Database {
             connection.close();
             }
 
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
         return list;
     }
+
+    public int existCity(String code3, String cityName) {//metóda či mesto v danej krajine existuje
+        if (code3 == null || code3.equals("") || cityName == null || cityName.equals(""))
+            return -1; //kontrola na prázdne hodnoty v stĺpcoch code a názov mesta
+
+        String query = "SELECT id FROM city WHERE CountryCode LIKE ? AND name LIKE ?";
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, username, password);
+            if (connection != null) {
+                PreparedStatement ps = connection.prepareStatement(query);
+                ps.setString(1, code3);
+                ps.setString(2, cityName);
+                ResultSet rs = ps.executeQuery();
+
+                if(rs.next()){
+                    int id=rs.getInt("id");
+                    connection.close();
+                    return id;
+                }else {
+                    connection.close();
+                    return -1;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public boolean  insertNewMonument( String code3, String city, String name ){
+        if(name==null || name.equals(""))
+            return false;
+        int cityId=existCity(code3,city);
+        if(cityId==-1)
+            return false;
+        String query="INSERT INTO monument(name, city) VALUES (?, ?)";//vloženie monumentu
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, username, password);
+            if (connection != null) {
+                PreparedStatement ps = connection.prepareStatement(query);
+                ps.setString(1,name);
+                ps.setInt(2,cityId);
+                ps.executeUpdate();
+                connection.close();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
 }
 
