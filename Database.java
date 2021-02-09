@@ -3,6 +3,7 @@ package sk.kosickaakademia.kolesarova.mysql;
 import sk.kosickaakademia.kolesarova.mysql.pociatTriedy.CapitalCity;
 import sk.kosickaakademia.kolesarova.mysql.pociatTriedy.City;
 import sk.kosickaakademia.kolesarova.mysql.pociatTriedy.Country;
+import sk.kosickaakademia.kolesarova.mysql.pociatTriedy.Monument;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -161,6 +162,34 @@ public class Database {
         }
 
         return true;
+    }
+
+    public List<Monument> getMonuments(){
+        String query="SELECT country.name AS Country, city.name AS City, monument.name AS Monument, monument.id "+
+                "FROM monument "+
+                "INNER JOIN city ON monument.city=city.ID "+
+                "INNER JOIN country ON city.CountryCode=country.Code";
+        List<Monument> list=new ArrayList<>();
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, username, password);
+            if (connection != null) {
+                PreparedStatement ps = connection.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    String country=rs.getString("Country");
+                    String city= rs.getString("City");
+                    String name= rs.getString("Monument");
+                    int id=rs.getInt("id");
+                    Monument monument=new Monument(city,name,id,country);
+                    list.add(monument);
+                }
+                connection.close();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
     }
 
 }
