@@ -1,5 +1,7 @@
 package sk.kosickaakademia.kolesarova.mysql;
 
+import org.json.simple.parser.ParseException;
+import sk.kosickaakademia.kolesarova.mysql.json.Server;
 import sk.kosickaakademia.kolesarova.mysql.output.Output;
 import sk.kosickaakademia.kolesarova.mysql.pociatTriedy.CapitalCity;
 import sk.kosickaakademia.kolesarova.mysql.pociatTriedy.City;
@@ -12,14 +14,24 @@ public class Main {
         Database database=new Database();
         Output output=new Output();
 
-        List<City> cities=database.getCities("Argentina");
+       /* List<City> cities=database.getCities("Argentina");
         output.printCities(cities);
 
         List<CapitalCity> capitalCities=database.getCapitalCities("Europe");
         output.printCapitalCities(capitalCities);
 
-        database.insertNewMonument("SVK","Humenne","Kastiel");
+        database.insertNewMonument("CZE","Praha","Staromestsky orloj");
         List<Monument> monuments=database.getMonuments();
-        output.printMonuments(monuments);
+        output.printMonuments(monuments);*/
+
+
+        Server server=new Server();
+        System.out.println(server.getMonuments());
+        try {
+            server.insertNewMonument("{\"country\":\"Spain\",\"city\":\"Barcelona\",\"Sagrada Familia\"}");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 }
