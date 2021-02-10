@@ -26,12 +26,13 @@ public class Main {
 
 
         Server server=new Server();
-        System.out.println(server.getMonuments());
+
         try {
-            server.insertNewMonument("{\"country\":\"Spain\",\"city\":\"Barcelona\",\"Sagrada Familia\"}");
+            server.insertNewMonument("{\"code3\":\"ESP\",\"city\":\"Barcelona\",\"name\":\"Sagrada Familia\"}");
+
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
+        System.out.println(server.getMonuments());
     }
 }
